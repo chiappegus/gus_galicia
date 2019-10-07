@@ -298,6 +298,27 @@ dump($statusCodeSs);
 dump( $responseBCRA->getContent(false));
 
 
+
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/merval_usd');
+
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/var_usd_of_anual');
+
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+
+
 return $this->render('default/index.html.twig', [
   'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
   ]);
