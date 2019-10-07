@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 //nuevo para probar la api
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\CurlHttpClient;
 
 
 
@@ -31,37 +32,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 // Needed to create the SOAP server
 use Zend\Soap;
+use GuzzleHttp\Client;
+use GuzzleHttp\Promise;
 
 class SoapController extends Controller
 {  
-    public $theUri;
-    /**
-     * To display the WSDL you have to call http://.../soap/hello?wsdl (see @Route)
-     *
-     * @Route("/soap/hello", name="soap_hello")
-     */
-    public function hello()
-    {
-        // This wil generate the absolute URL of the current action (end point) based on it's route name
-        $theUri = $this->generateUrl('soap_hello', [], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        // This is the object to instanciate when the webservice is invoked, use any controller
-        $theService = new HelloController();
-        //$theUri =$this->theUri;
-
-        // Check if we should disply WSDL or execute the call
-        if (isset($_GET['wsdl']))
-           
-            return $this->handleWSDL($theUri, $theService);
-        else
-            
-            return $this->handleSOAP($theUri, $theService);
-
-         
-    }
+  public $theUri;
+    
     
 
-   
+    
 
 
     /**
@@ -73,8 +53,8 @@ class SoapController extends Controller
     {
 
 
-      $status ='Hello , server time is ' . date ('H:i:s');
-      dump($status);
+     // $status ='Hello , server time is ' . date ('H:i:s');
+     // dump($status);
       /*=====================================
       =            estoy con api            =
       =====================================*/
@@ -86,145 +66,243 @@ class SoapController extends Controller
       
 
       $httpClient = HttpClient::create();
-$response = $httpClient->request('GET', 'https://api.github.com/repos/symfony/symfony-docs');
+      $response = $httpClient->request('GET', 'https://api.github.com/repos/symfony/symfony-docs');
 
-$statusCode = $response->getStatusCode();
+      $statusCode = $response->getStatusCode();
 
-dump($statusCode);
+      //dump($statusCode);
 
-$content = $response->getContent();
+      $content = $response->getContent();
 
-dump($content);
+      //dump($content);
 
 
 //https://galicia-innovation.3scale.net/docs
       //
       //
       //
-$response = $httpClient->request('GET', 'https://api-2445582796097.staging.gw.apicast.io/api/v1/accounts?apikey=e2299ad9e3c66d757e21f157b318e90e');
-
-$statusCode = $response->getStatusCode();
+       $response = $httpClient->request('GET', 'https://api-2445582796097.staging.gw.apicast.io/api/v1/accounts?apikey=e2299ad9e3c66d757e21f157b318e90e');
+      
+      $statusCode = $response->getStatusCode();
 
 //dump($statusCode);
 
-$content = $response->getContent();
+      $content = $response->getContent();
 
 //dump($content);
 
 
-$content = $response->toArray();
+      $content = $response->toArray();
 
-//dump($content);
 
-//NEW 
-//
-//$response = $httpClient->request
-//
-//"auth_basic", "auth_bearer", "query", "headers", "body", "json", "user_data", "max_redirects", "http_version", "base_uri", "buffer", "on_progress", "resolve", "proxy", "no_proxy", "timeout", "max_duration", "bindto", "verify_peer", "verify_host", "cafile", "capath", "local_cert", "local_pk", "passphrase", "ciphers", "peer_fingerprint", 
-$clients = HttpClient::create(/*['user_data' => 'e2299ad9e3c66d757e21f157b318e90e']*/
-/*['headers' => 'e2299ad9e3c66d757e21f157b318e90e']*/
+      $clients = HttpClient::create();
 
-  );
 
-/*$response = $client->request('GET', 'https://httpbin.org/get', [
+
+$lugar='accounts';
+$responseS = $clients->request('GET', 'https://api-2445582796097.staging.gw.apicast.io/api/v1/'.$lugar , 
+  [
     // these values are automatically encoded before including them in the URL
-    'query' => [
-        'apikey' => 'e2299ad9e3c66d757e21f157b318e90e'
-    ],
-]);*/
-
-/*$responseS = $clients->request( 'GET', 'https://api-2445582796097.staging.gw.apicast.io/api/v1/accounts',[
-    // use a different HTTP Basic authentication only for this request
-    'user_key' => 'e2299ad9e3c66d757e21f157b318e90e']);
+  'query' => [
+  
+  'apikey' => 'e2299ad9e3c66d757e21f157b318e90e'
+  ],
+  ]);
 
 
-You can pass headers with curl via the -H argument like so:
-
-curl https://api-2445582796097.staging.gw.apicast.io/api/v1 -H "AUTH_USER: <e2299ad9e3c66d757e21f157b318e90e>"
-
-
-*/
-$responseS = $clients->request('GET', 'https://api-2445582796097.staging.gw.apicast.io/api/v1/accounts' , 
-    [
-    // these values are automatically encoded before including them in the URL
-    'query' => [
-        'apikey' => 'e2299ad9e3c66d757e21f157b318e90e'
-   ],
-]);
-
-//var_dump($clients);
-
-//dump($responseS);
 
 
 $statusCodeS = $responseS->getStatusCode();
 
-//dump($statusCodeS);
+echo "GET";
 var_dump($statusCodeS);
 
+
+$content = $responseS->getContent();
+
+$content = $response->toArray();
+//var_dump($content);
 
 
 
 
 $content1 = $responseS->getContent();
 
-dump($content1);
+//dump($content1);
 
 
 $content = $responseS->toArray();
-dump($content);
+//dump("pepe");
 
-      return $this->render('default/index.html.twig', [
-        'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
-        ]);
+$lugar='loans/mortgage_simulation';
+
+$response1 = $clients->request('GET', 'https://api-2445582796097.staging.gw.apicast.io/api/v1/'.$lugar , 
+  [
+    // these values are automatically encoded before including them in the URL
+  'query' => [
+  
+  'apikey' => 'e2299ad9e3c66d757e21f157b318e90e'
+  ],
+  ]);
 
 
 
-    }
+$statusCodeS = $response1->getStatusCode();
 
-    /**
-     * return the WSDL
-     */
-    public function handleWSDL($uri, $class)
-    {
-        // Soap auto discover
-        $autodiscover = new Soap\AutoDiscover();
-        $autodiscover->setClass($class);
-        $autodiscover->setUri($uri);
+echo "loans  ";
+var_dump($statusCodeS);
+$content2 = $response1->getContent(false);
+/*$data = file_get_contents($content2);*/
+$products = json_decode($content2, true);
+$arr = json_decode($content2, true);
 
-        // Response
-        $response = new Response();
-        $response->headers->set('Content-Type', 'text/xml; charset=UTF-8'); // WSDL is a XML content
-        
-        // Start Output Buffering, nothing will be displayed ...
-        ob_start();
-        // Handle Soap
-        $autodiscover->handle();
-        // ... Stop Output Buffering and get content into variable
-        $response->setContent(ob_get_clean());
-        return $response;
-    }
 
-    /**
-     * execute SOAP request
-     */
-    public function handleSOAP($uri, $class)
-    {
-        // Soap server
-        $soap = new Soap\Server(null,
-            array('location' => $uri,
-                'uri' => $uri,
-            ));
-        $soap->setClass($class);
+ 
 
-        // Response
-        $response = new Response();
-        $response->headers->set('Content-Type', 'text/xml; charset=ISO-8859-1');
 
-        ob_start();
-        // Handle Soap
-        $soap->handle();
-        $response->setContent(ob_get_clean());
-        return $response;
-    }
+/*echo "<br/>aca<br/>";
+ var_dump(array_filter($arr, function($k) {
+    return $k == 'status';
+}, ARRAY_FILTER_USE_KEY));
+
+echo "<br/>aca2<br/>";
+ var_dump(array_filter($arr, function($k) {
+    return $k == 'status';
+}, ARRAY_FILTER_USE_BOTH ));
+
+//var_dump($products);
+
+echo "<br/>aca3<br/>";
+echo "<br/>aca3<br/>";
+foreach ($products as $product) {
+    echo '<pre>';
+    print_r($product);
+    echo '</pre>';
+}
+
+if ($products['status']==405) {
+ echo "chupa me un huevo";
+}*/
+
+
+
+
+
+
+//$content2 =$response1->toArray(false);
+
+//var_dump($content2['message']);
+
+/*
+https://stackoverflow.com/questions/16920291/post-request-with-json-body
+POST VER
+/creditcards
+
+[
+  {
+    "Id": 102,
+    "Customer_Id": 1542,
+    "Buy_Limit": "500000.0",
+    "Category": "consumidor"
+  }
+]
+
+
+
+
+*/
+
+
+$clientss = HttpClient::create(['auth_bearer' => 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDE5OTQ2ODgsInR5cGUiOiJleHRlcm5hbCIsInVzZXIiOiJndXN0YXZvY2hpYXBwZUB5YWhvby5jb20uYXIifQ.7e9pwwZNNcNVl3D_MG8Yv3t8_BazR-_wU_4R-mOMzNLF8U07FdtOmXrsZ9KxMi19nOgMP3th98TBd7lkuadRbQ']
+  );
+
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/usd_of_minorista');
+
+
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/base');
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+
+
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/base_usd');
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+
+
+      //
+      //
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/lebac_usd');
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+
+
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/leliq_usd');
+
+
+
+
+
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+
+
+
+
+
+      //
+      //
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/tasa_leliq');
+
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+
+$responseBCRA = $clientss->request('GET', 'https://api.estadisticasbcra.com/uva');
+
+
+$statusCodeSs = $responseBCRA->getStatusCode();
+dump($statusCodeSs);
+
+
+dump( $responseBCRA->getContent(false));
+
+
+return $this->render('default/index.html.twig', [
+  'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
+  ]);
+
+
+
+}
 }
